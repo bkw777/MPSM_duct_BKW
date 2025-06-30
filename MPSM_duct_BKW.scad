@@ -177,7 +177,7 @@ pillar_y = -4;
 /* [Hidden] */
 e = 0.01;
 $fa=1;
-$fs=$preview?1:0.4;
+$fs=$preview?0.6:0.4;
 
 module fan () {
   import("lib/4020fan.stl");
@@ -338,6 +338,8 @@ module part_blower_mount() {
   difference() {
     // add
     group() {
+      top_of_manifold = bottom_y-pb_y+pd_mh-wt;
+      descender_height = pb_be-top_of_manifold+pb_oh;
       // top-left screw boss
       translate([pb_tlx,pb_tly,-pb_sih]) {
         cylinder(d=bd,h=pb_sih);
@@ -351,19 +353,35 @@ module part_blower_mount() {
         sphere(d=bd);
       }
       hull() {
-      translate([pb_tlx,pb_bry-bd/2,-pt]) cube([pw,bd*2,pt]);
-      translate([pb_tlx-bd/2,pb_bry,-pt]) cube([bd*2,pd,pt]);
-      // descender to duct
-      top_of_manifold = bottom_y-pb_y+pd_mh-wt;
-      descender_height = pb_be-top_of_manifold+pb_oh;
-      //manifold_above_z = -pb_z-pb_le-pbow;
-      //manifold_below_z = -nozzle_y;
-
-
-      translate([pb_le-wt,top_of_manifold-e,-pt])
-        //cube([-pb_z-pb_le-nozzle_y+wt,descender_height,pt]);
-        cube([pb_ow+2*wt,descender_height,pt]);
+        // triangle in corner for fillet to cut away
+        // don't go all the way to the ends
+        translate([pb_tlx,pb_tly-bd*2,-pt]) cylinder(d=bd,h=pt);
+        translate([pb_tlx,pb_bry,-pt]) cylinder(d=bd,h=pt);
+        translate([pb_brx-bd*2,pb_bry,-pt]) cylinder(d=bd,h=pt);
       }
+      hull() {
+        // top left
+        translate([pb_tlx,pb_tly,-pt]) cylinder(d=bd,h=pt);
+        translate([pb_tlx,pb_bry,-pt]) cylinder(d=bd,h=pt);
+      }
+      //translate([pb_tlx,pb_bry-bd/2,-pt]) cube([pw,bd*2,pt]);
+      //translate([pb_tlx-bd/2,pb_bry,-pt]) cube([bd*2,pd,pt]);
+      // bottom right
+      hull() {
+        translate([pb_tlx,pb_bry,-pt]) cylinder(d=bd,h=pt);
+        translate([pb_brx,pb_bry,-pt]) cylinder(d=bd,h=pt);
+        // descender to duct
+        //manifold_above_z = -pb_z-pb_le-pbow;
+        //manifold_below_z = -nozzle_y;
+
+        translate([pb_le-wt,top_of_manifold-e,-pt])
+          //cube([-pb_z-pb_le-nozzle_y+wt,descender_height,pt]);
+          cube([pb_ow+2*wt,descender_height,pt]);
+      }
+      //hull() {
+      //  translate([pb_tlx,pb_tly,-pt]) cylinder(d=bd,h=pt);
+      //  translate([pb_le-wt,top_of_manifold-e,-pt]) cube([pb_ow+2*wt,descender_height,pt]);
+      //}
     }
 
     // cut
@@ -510,7 +528,7 @@ module manifold () {
         rotate([0,0,i])
           translate([0,pd_nr+pd_mh/2,pd_mh/2])
             rotate([90+manifold_jets_angle,0,0])
-              #cylinder(d=manifold_jets_diameter,h=pd_nr+pd_mh/2);
+              cylinder(d=manifold_jets_diameter,h=pd_nr+pd_mh/2);
       }
 
     }
@@ -564,6 +582,7 @@ module all () {
 
 ///////////////////////////////////////////////////////////////////////////////////
 
+translate([0,nozzle_y,-bottom_y+clearance_above_print]) rotate([90,0,0])
 all();
 
 //sqylinder(w=40,d=40,h=5,r=2);
