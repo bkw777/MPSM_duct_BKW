@@ -19,6 +19,7 @@ show_inserts = true;
 show_nozzle = true;
 show_build_plate = true;
 show_carriage = true;
+show_jets = true;
 
 /* [Hidden] */
 // screw hole sizes [bare,insert]
@@ -86,7 +87,7 @@ hf_z = hf_fz + hf_ft;
 // hotend fan ID
 hf_id = hf_w-wt*2;
 
-hotend_width = 35; // [34:"more room for spring wire",35:"flush with mating hotend part"]
+hotend_width = 34; // [34:"more room for spring wire",35:"flush with mating hotend part"]
 
 /* [Hidden] */
 hotend_fan_thickness = 20;
@@ -211,11 +212,11 @@ module blower () {
 }
 
 module m3insert () {
-  rotate([0,0,0]) import("lib/insert_m3.stl");
+  translate([0,0,hf_sih]) rotate([180,0,0]) import("lib/insert_m3.stl");
 }
 
 module m4insert () {
-  rotate([90,0,0]) import("lib/insert_m4.stl");
+  translate([0,0,pb_sih]) rotate([180,0,0]) import("lib/insert_m4.stl");
 }
 
 module mirror_copy(v = [1, 0, 0]) {
@@ -447,24 +448,12 @@ module part_blower_mount() {
         translate([pb_tlx,pb_tly,-pt]) cylinder(d=bd,h=pt);
         translate([pb_tlx,pb_bry,-pt]) cylinder(d=bd,h=pt);
       }
-      //translate([pb_tlx,pb_bry-bd/2,-pt]) cube([pw,bd*2,pt]);
-      //translate([pb_tlx-bd/2,pb_bry,-pt]) cube([bd*2,pd,pt]);
       // bottom right
       hull() {
         translate([pb_tlx,pb_bry,-pt]) cylinder(d=bd,h=pt);
         translate([pb_brx,pb_bry,-pt]) cylinder(d=bd,h=pt);
-        // descender to duct
-        //manifold_above_z = -pb_z-pb_le-pbow;
-        //manifold_below_z = -nozzle_y;
-
-        translate([pb_le-wt,top_of_manifold-e,-pt])
-          //cube([-pb_z-pb_le-nozzle_y+wt,descender_height,pt]);
-          cube([pb_ow+2*wt,descender_height,pt]);
+        translate([pb_le-wt,top_of_manifold-e,-pt]) cube([pb_ow+2*wt,descender_height,pt]);
       }
-      //hull() {
-      //  translate([pb_tlx,pb_tly,-pt]) cylinder(d=bd,h=pt);
-      //  translate([pb_le-wt,top_of_manifold-e,-pt]) cube([pb_ow+2*wt,descender_height,pt]);
-      //}
     }
 
     // cut
@@ -506,7 +495,7 @@ module part_blower_duct(cut=false) {
   
     // blower socket
     translate([pb_x-g,pdmh-e,-pbow-pb_z-pb_le+g])
-      cube([pbod,blower_connector_height+2*e,pbow]);
+      cube([pbod,blower_connector_height,pbow]);
 
     // blower to manifold
     hull() {
@@ -613,12 +602,19 @@ module manifold () {
       //    cube([pd_mh,R*2,pd_mh+2*e]);
 
       // jets
-      p = (360-A)/(manifold_jets-(A?1:0));
-      for (i = [ a : p : 360-a ]) {
+      jp = (360-A)/(manifold_jets-(A?1:0));
+      jd = manifold_jets_diameter;
+      jh = pd_nr+pd_mh/2;
+      jy = pd_nr+pd_mh/2;
+      jz = pd_mh/2;
+      ja = 90+manifold_jets_angle;
+      for (i = [ a : jp : 360-a ]) {
         rotate([0,0,i])
-          translate([0,pd_nr+pd_mh/2,pd_mh/2])
-            rotate([90+manifold_jets_angle,0,0])
-              cylinder(d=manifold_jets_diameter,h=pd_nr+pd_mh/2);
+          translate([0,jy,jz])
+            rotate([ja,0,0]) {
+              cylinder(d=jd,h=jh);
+              if (show_jets) %cylinder(d=jd,h=jh);
+            }
       }
 
     }
@@ -657,11 +653,11 @@ module all () {
         cube([pd_fr+e,pd_fr+e,pb_ow+2*wt]);
         translate([0,pd_fr,-e]) cylinder(r=pd_fr,h=pb_ow+2*wt+2*e);
       }
-      translate([pd_mw/2,bottom_y,-pb_z-pb_le-pb_ow-wt])
+      translate([pd_mw/2,bottom_y,-pb_z-pb_le-pb_ow-wt+e])
       rotate([-90,0,0])
       difference() {
         cube([pd_fr+e,pd_fr+e,pd_mh]);
-        translate([pd_fr,pd_fr,-e]) cylinder(r=pd_fr,h=pd_mh+2*e);
+        translate([pd_fr,pd_fr,-e]) cylinder(r=pd_fr+e/2,h=pd_mh+2*e);
       }
 
     }
@@ -670,7 +666,7 @@ module all () {
     // cut hotend fan and screw holes
     // after adding other parts that intrude into the area
     group() {
-      translate([0,0,hf_z]) {
+      translate([0,0,hf_z-e]) {
         sqylinder(w=hf_w+2*fc,d=hf_w+2*fc,h=hf_t,r=hf_cr-fc); // sharpen the corners slightly
         translate([0,0,-hf_sih]) qc(w=hf_bp,d=hf_bp,h=hf_sih+e,r=hf_sid/2);
         translate([0,0,-hf_ft+1.1]) cylinder(d=hf_id,h=hf_ft);
