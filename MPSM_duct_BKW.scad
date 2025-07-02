@@ -3,8 +3,7 @@
 //
 // Use the Customizer window to select options.
 // <design default> = 40mm fan, no screw inserts, stock heat block
-// "BKW" = screw inserts, Triangle Lab CHC cylindrical ceramic heater
-// for several values 0 or -1 means automatic or default
+// for some values 0 or -1 means automatic or default
 
 hotend_fan_size = 40; // [30,35,40]
 hf_w = hotend_fan_size;
@@ -34,7 +33,6 @@ cutaway_front = false;
 cutaway_front_y = -4;
 cutaway_back = false;
 cutaway_back_y = -4;
-
 
 /* [Hidden] */
 // screw hole sizes [bare,insert]
@@ -102,7 +100,7 @@ hf_z = hf_fz + hf_ft;
 // hotend fan ID
 hf_id = hf_w-wt*2;
 
-hotend_width = 34; // [34:"more room for spring wire",35:"flush with mating hotend part"]
+hotend_width = 34; // [34:"34 (square, and more room for spring clip)",35:"35 (flush with mating part)"]
 
 /* [Hidden] */
 hotend_fan_thickness = 20;
@@ -136,8 +134,8 @@ pb_brx = 20;   // bottom right screw
 pb_bry = -18;  // bottom right screw
 pb_le = -27.5; // left edge
 pb_be = -25.5; // bottom edge
-pb_ow = 20;    // outlet width
-pb_od = 15;    // outlet depth
+pb_ow = 20.1;    // outlet width
+pb_od = 15.1;    // outlet depth
 pb_oh = 2.5;   // outlet height
 
 /* [Part Blower] */
@@ -162,42 +160,30 @@ pb_y = part_blower_y;
 part_blower_z = 6;
 pb_z = part_blower_z;
 
-/* [Manifold] */
-nozzle_clearance_radius = 12;
-pd_nr = nozzle_clearance_radius;
 
 // manifold width vs height
 //
-// any wider than 42mm and it hits the Z tower
+// The Z tower comes to within 21mm from the nozzle,
+// so we set a hard limit of 42mm wide for anything
+// symmetrical centered on the nozzle.
+//
+// The size of the manifold tubes is whatever can fit between
+// the 42mm max width and the heat block.
+/* [Hidden] */
 max_manifold_width = 42;
 
-// Option A : height is blower output depth
-//part_cooler_manifold_width = 40;
-//pd_mw = part_cooler_manifold_width;
-//part_cooler_manifold_height = 0;
-//pd_mh = (part_cooler_manifold_height?part_cooler_manifold_height:pb_od);
-//
-// Option B : height derived from width minus nozzle clearance
-part_cooler_manifold_width = max_manifold_width;
-pd_mw = part_cooler_manifold_width;
-part_cooler_manifold_height = 0;
-pd_mh = (part_cooler_manifold_height?part_cooler_manifold_height:pd_mw/2-pd_nr);
-//
-// Option C : width derived from nozzle clearance plus height
-//part_cooler_manifold_height = 0;
-//pd_mh = (part_cooler_manifold_height?part_cooler_manifold_height:pb_od);
-//part_cooler_manifold_width = 0;
-//pd_mw = (part_cooler_manifold_width?part_cooler_manifold_width:(pd_nr+pd_mh)*2);
-//
-// Option D : width derived from fan width plus blower mount height
-// pd_mw comes out to 56, which is too wide, hits the Z tower
-//part_cooler_manifold_height = 0;
-//pd_mh = (part_cooler_manifold_height?part_cooler_manifold_height:pb_od);
-//part_cooler_manifold_width = 0;
-//pd_mw = (part_cooler_manifold_width?part_cooler_manifold_width:hf_w+pb_sih*2);
+/* [Manifold] */
+heater_clearance_radius = 12;
+pd_nr = heater_clearance_radius;
 
-//echo ("manifold width:",pd_mw);
+// 0 = max
+part_cooler_manifold_width = 0;
+pd_mw = (part_cooler_manifold_width ? part_cooler_manifold_width : max_manifold_width );
 assert(pd_mw<=max_manifold_width,"Manifold width > 42mm hits the Z tower!");
+// 0 = auto
+part_cooler_manifold_height = 0;
+pd_mh = (part_cooler_manifold_height ? part_cooler_manifold_height : pd_mw/2-pd_nr );
+
 
 // TODO shift 50mm fan off center to avoid hitting Z tower
 
@@ -524,11 +510,8 @@ module part_blower_duct(cut=false) {
     translate([0,0,-pbow-pb_z-pb_le+g]) cube([e,pdmh,pbow]);
       translate([0,0,-pbow-pb_z-pb_le+g]) {
         rotate([-90,0,0]) intersection() {
-          //translate([-(pdmhw-pbow),0,0]) #cylinder(r=pbow,h=pdmh);
           r = pb_ow+g; // pbow but only one g
-          //translate([-(pd_mw/2-pb_ow)+wt,-g,0]) #cylinder(r=r,h=pdmh);
           translate([r-pd_mw/2+c,-g,0]) cylinder(r=r,h=pdmh);
-          //translate([r-pd_mw/2+c,-g,0]) #cylinder(r=r,h=pdmh);
           translate([-pdmhw-e,-pbow-e,-e]) cube([pdmw+e,pbow+e,pdmh+2*e]);
         }
       }
@@ -553,6 +536,9 @@ module part_blower_duct(cut=false) {
       mirror_copy([1,0,0])
         translate([pd_nr+pd_mh/2,pd_mh/2-wt,nozzle_y-e])
           cylinder(r=pd_mh/2-wt,h=wt+2*e);
+      n = 3; // width of notch for seam in blower outlet
+      translate([pb_x+pb_od/2-n/2,-wt+pd_mh+blower_connector_height-2*c-pb_oh,-pb_z-pb_le-e])
+        cube([n,pb_oh+e,wt+2*e]);
     }
 
     // pillar
@@ -611,11 +597,6 @@ module manifold () {
         translate([-R-e,-R-e,-e]) cube([R*2+2*e,R,pd_mh+2*e]);
         translate([0,0,-2*e]) cylinder(r=pd_nr+r+e,h=pd_mh+4*e);
       }
-
-      // clip the sides to the overall width      
-      //*mirror_copy([1,0,0])
-      //  translate([pd_mw/2-e,nozzle_y+e,-e])
-      //    cube([pd_mh,R*2,pd_mh+2*e]);
 
       // jets
       jp = (360-A)/(manifold_jets-(A?1:0));

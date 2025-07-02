@@ -1,4 +1,8 @@
 // treat *.stl as compiled output - put in release assets instead
-*.stl
+stl/
+
+*.[Ss][Tt][Ll]
 *.gcode
-!stl/
+*.3mf
+*.[Ss][Tt][Pp]
+*.[Ss][Tt][Ee][Pp]
