@@ -21,13 +21,28 @@ show_build_plate = true;
 show_carriage = true;
 show_jets = true;
 
+/* [Debug Cutaways] */
+cutaway_top = false;
+cutaway_top_z = 0;
+cutaway_bottom = false;
+cutaway_bottom_z = 11;
+cutaway_left = false;
+cutaway_left_x = 0;
+cutaway_right = false;
+cutaway_right_x = 0;
+cutaway_front = false;
+cutaway_front_y = -4;
+cutaway_back = false;
+cutaway_back_y = -4;
+
+
 /* [Hidden] */
 // screw hole sizes [bare,insert]
 M2_5 = [2,4];
 M3 = [2.5,4.4];
 M4 = [3.2,5.6];
 
-/* [Advanced] */
+/* [Misc] */
 clearance_above_print = 2;
 fitment_clearance = 0.2;
 fc = fitment_clearance;
@@ -37,7 +52,7 @@ small_corner_radius = 1;
 
 top_ledge_style = 2; // [0:"None",1,2,3]
 
-/* [Spring Hook] */
+/* [Spring Hooks] */
 spring_hook_style = 1; // [0,1]
 spring_hook_inset = 6;
 hz = spring_hook_inset;
@@ -195,8 +210,9 @@ pillar_y = -4;
 
 /* [Hidden] */
 e = 0.01;
-$fa=1;
-$fs=$preview?0.6:0.4;
+//$fa = 1;
+//$fs = $preview?0.6:0.4;
+$fn = 72;
 
 module fan () {
   stl =
@@ -499,13 +515,13 @@ module part_blower_duct(cut=false) {
 
     // blower to manifold
     hull() {
-      translate([-pdmh+pb_x+pbod-g,pdmh,-pbow-pb_z-pb_le+g])
+    translate([-pd_mh+pb_x+pb_od+wt,pd_mh-c,-pbow-pb_z-pb_le+g])
         rotate([0,0,-90])
           intersection() {
-            cylinder(r=pdmh,h=pbow);
-            translate([0,0,-e]) cube([pdmh+e,pdmh+e,pbow+2*e]);
+            cylinder(r=pd_mh-c,h=pbow);
+            translate([c,0,-e]) cube([pdmh+e,pd_mh-c+e,pbow+2*e]);
           }
-      translate([0,0,-pbow-pb_z-pb_le+g]) cube([e,pdmh,pbow]);
+    translate([0,0,-pbow-pb_z-pb_le+g]) cube([e,pdmh,pbow]);
       translate([0,0,-pbow-pb_z-pb_le+g]) {
         rotate([-90,0,0]) intersection() {
           //translate([-(pdmhw-pbow),0,0]) #cylinder(r=pbow,h=pdmh);
@@ -523,8 +539,8 @@ module part_blower_duct(cut=false) {
       cube([pdmw-pdmh,pdmh,manifold_below_z+manifold_above_z+e]);
 
     mirror_copy([1,0,0]) hull() {
-      translate([-pdmhw+pdmhh,pdmhh,-manifold_below_z+c/2-e])
-        cylinder(d=pdmh,h=1+2*e+c);
+      translate([-pdmhw+pdmhh,pdmhh,-manifold_below_z+c-c*e])
+        cylinder(d=pdmh,h=e+c*e);
       o = pd_fr-manifold_above_z+0.5;
       translate([-pdmhw,0,-c*0.9-o])
         cube([pdmh,pdmh,manifold_above_z+wt+o]);
@@ -687,11 +703,14 @@ module all () {
       }
 
       // debug cutaways
-      //translate([0,-5,25]) cube([60,60,30],center=true);
-      //translate([-15,0,0]) cube([30,60,60],center=true);
-      //translate([0,15,0]) cube([60,30,60],center=true);
-      //translate([0,bottom_y-15+pd_mh/2,0]) cube([60,30,60],center=true);
-
+      if ($preview) {
+        if (cutaway_top) translate([-50,cutaway_top_z,-50]) cube([100,25-cutaway_top_z,100]);
+        if (cutaway_bottom) translate([-50,bottom_y-clearance_above_print-5,-50]) cube([100,cutaway_bottom_z,100]);
+        if (cutaway_left) translate([-pd_mw/2-5,bottom_y-clearance_above_print-5,-50]) cube([5+pd_mw/2+cutaway_left_x,100,100]);
+        if (cutaway_right) translate([cutaway_right_x,bottom_y-clearance_above_print-5,-50]) cube([50-cutaway_right_x,100,100]);
+        if (cutaway_front) translate([-50,bottom_y-clearance_above_print-5,-cutaway_front_y]) cube([100,100,hf_z+10+cutaway_front_y]);
+        if (cutaway_back) translate([-50,bottom_y-clearance_above_print-5,-50]) cube([100,100,50-cutaway_back_y]);
+      }
     }
   }
 }
