@@ -3,12 +3,10 @@
 //
 // Use the Customizer window to select options.
 // <design default> = 40mm fan, no screw inserts, stock heat block
-// for some values 0 or -1 means automatic or default
 
 hotend_fan_size = 40; // [30,35,40]
 hf_w = hotend_fan_size;
 screw_hole_inserts = false;
-shd = screw_hole_inserts?1:0;
 heater_type = "stock"; // ["stock","v6","chc"]
 
 
@@ -44,9 +42,9 @@ M4 = [3.2,5.6];
 clearance_above_print = 2;
 fitment_clearance = 0.2;
 fc = fitment_clearance;
-wall_thickness = 1;
+wall_thickness = 1; // .1
 wt = wall_thickness;
-small_corner_radius = 1;
+small_corner_radius = 1; // .1
 
 top_ledge_style = 2; // [0:"None",1,2,3]
 
@@ -59,7 +57,7 @@ spring_hook_clearance = 3;
 /* [Manifold] */
 manifold_jets_angle = 30;
 manifold_opening_angle = 140;
-manifold_jets_diameter = 4;
+manifold_jets_diameter = 4; // .1
 manifold_jets = 10;
 
 /* [Hotend Fan] */
@@ -73,26 +71,33 @@ hf_bp =
 //echo("hotend fan size (hf_w)",hf_w);
 //echo("hotend fan bolt pattern (hf_bp)",hf_bp);
 
-hotend_fan_screw_hole_diameter = 0;
+
+shd = screw_hole_inserts?1:0;
+
+// -1 = auto
+hotend_fan_screw_hole_diameter = -1; // .1
 hf_sid =
-  (hotend_fan_screw_hole_diameter>0) ? hotend_fan_screw_hole_diameter :
+  (hotend_fan_screw_hole_diameter>=0) ? hotend_fan_screw_hole_diameter :
   (hf_w==30) ? M2_5[shd] :
   (hf_w<=40) ? M3[shd] :
   M4[shd] ;
 //echo("hotend fan screw hole id (hf_sid)",hf_sid);
 
-hotend_fan_screw_hole_depth = 0;
+// -1 = auto
+hotend_fan_screw_hole_depth = -1; // .1
 hf_sih =
-  (hotend_fan_screw_hole_depth) ? hotend_fan_screw_hole_depth :
+  (hotend_fan_screw_hole_depth>=0) ? hotend_fan_screw_hole_depth :
   (hf_w<50) ? 6 : 8 ;
 //echo("hotend fan screw hole depth (hf_sih)",hf_sih);
 
-hotend_fan_corner_radius = -1;
+// -1 = auto
+hotend_fan_corner_radius = -1; // .1
 hf_cr = (hotend_fan_corner_radius<0)?(hf_w-hf_bp)/2:hotend_fan_corner_radius;
 
 hotend_fan_flange_elevation = 14;
 hf_fz = hotend_fan_flange_elevation;
 
+// -1 = auto
 hotend_fan_flange_thickness = -1;
 hf_ft = (hotend_fan_flange_thickness<0)?hf_sih:hotend_fan_flange_thickness;
 hf_z = hf_fz + hf_ft;
@@ -134,20 +139,21 @@ pb_brx = 20;   // bottom right screw
 pb_bry = -18;  // bottom right screw
 pb_le = -27.5; // left edge
 pb_be = -25.5; // bottom edge
-pb_ow = 20.1;    // outlet width
-pb_od = 15.1;    // outlet depth
+pb_ow = 20.1;  // outlet width
+pb_od = 15.1;  // outlet depth
 pb_oh = 2.5;   // outlet height
 
 /* [Part Blower] */
 
-part_blower_screw_hole_diameter = 0;
+// -1 = auto
+part_blower_screw_hole_diameter = -1; // .1
 pb_sid =
-  (part_blower_screw_hole_diameter>0) ? part_blower_screw_hole_diameter :
+  (part_blower_screw_hole_diameter>=0) ? part_blower_screw_hole_diameter :
   M4[shd];
 //echo("part blower screw hole id (pb_sid)",pb_sid);
 
-// (M4 insert needs 8)
-part_blower_screw_hole_depth = 8;
+// M4 insert = 8.5
+part_blower_screw_hole_depth = 8.5;
 pb_sih = part_blower_screw_hole_depth;
 part_blower_mount_plate_thickness = 3;
 
@@ -191,7 +197,7 @@ pd_mh = (part_cooler_manifold_height ? part_cooler_manifold_height : pd_mw/2-pd_
 part_cooler_duct_fillet_radius = 4;
 pd_fr = part_cooler_duct_fillet_radius;
 pillar_diameter = 5;
-pillar_chamfer = 1;
+pillar_chamfer = 1; // .1
 pillar_y = -4;
 
 /* [Hidden] */
