@@ -44,7 +44,7 @@ fitment_clearance = 0.2;
 fc = fitment_clearance;
 wall_thickness = 1; // .1
 wt = wall_thickness;
-small_corner_radius = 1; // .1
+small_corner_radius = 2; // .1
 
 top_ledge_style = 2; // [0:"None",1,2,3]
 
@@ -155,7 +155,10 @@ pb_sid =
 // M4 insert = 8.5
 part_blower_screw_hole_depth = 8.5;
 pb_sih = part_blower_screw_hole_depth;
-part_blower_mount_plate_thickness = 3;
+part_blower_mount_plate_thickness = 2;
+part_blower_lower_post = true;
+part_blower_lower_brace = false;
+part_blower_lower_brace_depth = 2;
 
 part_blower_x = 0;
 pb_x = part_blower_x + (hf_w>=40 ? hf_w/2+pb_sih : 20+pb_sih);
@@ -339,8 +342,9 @@ module hotend_fan_duct() {
       if (top_ledge_style==1) hull () {
         translate([-tll/2,heh/2-e,-hebt]) cube([tll,hebt+e,hebt*2]);
         translate([-tll/2,heh/2-e,hebt*2]) cube([tll,e,e]);
-      } else if (top_ledge_style==2) translate([-tll/2,heh/2,0]) rotate([0,90,0]) cylinder(r=hebt,h=tll);
-      else if (top_ledge_style==3) translate([-tll/2,heh/2,-hebt]) cube([tll,hebt,hebt+hf_fz]);
+      } else if (top_ledge_style==2) translate([0,heh/2,0]) hull() {
+        mirror_copy([1,0,0]) translate([tll/2,0,0]) sphere(r=hebt);
+      } else if (top_ledge_style==3) translate([-tll/2,heh/2,-hebt]) cube([tll,hebt,hebt+hf_fz]);
       
       // spring hooks
       hw = 3.5; // hook width
@@ -388,9 +392,9 @@ module hotend_fan_duct() {
       // fan screw insert pockets
       // deferred, cut later after the blower mount is added
       //translate([0,0,hf_z-hf_sih]) qc(w=hf_bp,d=hf_bp,h=hf_sih+e,r=hf_sid/2);
-      
+
       // hotend interface slot
-      translate([-hebw/2-fc,-heh/2-e-fc,-hebt-e]) cube([hebw+fc*2,heh+e*2+fc*2,hebt+e]);
+      translate([-hebw/2-fc,-heh/2-e,-hebt-e]) cube([hebw+fc*2,heh+e*2,hebt+e]);
       
       // funnel
       // fan
@@ -415,8 +419,8 @@ module part_blower_mount() {
     translate([pb_brx,pb_bry,0]) %m4insert();
   }
 
-
-  bd = pb_sid+4;
+  pwt = 2; // post wall thickness
+  bd = pb_sid+2*pwt;
   pw = pb_brx-pb_tlx;
   pd = pb_tly-pb_bry;
   pt = part_blower_mount_plate_thickness;
@@ -436,14 +440,20 @@ module part_blower_mount() {
       }
       // bottom-right screw boss
       translate([pb_brx,pb_bry,-pb_sih]) cylinder(d=bd,h=pb_sih);
-      // plate
-      translate([pb_tlx,pb_bry,-pb_sih]) {
+      // bottom-left post
+      if (part_blower_lower_post) translate([pb_tlx,pb_bry,-pb_sih]) {
         cylinder(d=bd,h=pb_sih);
         hull() {
           sphere(d=bd);
           translate([0,-pb_bry-pb_y-hf_bp/2,pb_sih-pb_x+hf_bp/2]) sphere(r=hf_cr);
         }
       }
+
+      bw = part_blower_lower_brace_depth;
+      if (part_blower_lower_brace) translate([pb_tlx+pb_sid/2,pb_bry-pt/2,-pt-bw]) cube([pw-pb_sid,pt,bw+e]);
+
+
+      // plate
       hull() {
         // triangle in corner for fillet to cut away
         // don't go all the way to the ends
@@ -504,6 +514,18 @@ module part_blower_duct(cut=false) {
     // blower socket
     translate([pb_x-g,pdmh-e,-pbow-pb_z-pb_le+g])
       cube([pbod,blower_connector_height,pbow]);
+
+    // gusset
+    if (!cut) hull () {
+      gw = pb_od+wt+e;
+      gd = gw;
+      gh = wt;
+      translate([pb_x-e,pd_mh+blower_connector_height-gh-e,manifold_above_z]) {
+        cube([gw,gh,e]);
+        translate([0,0,-gd])
+          cube([e,gh,gd]);
+      }
+    }
 
     // blower to manifold
     hull() {
@@ -650,17 +672,18 @@ module all () {
           manifold();
 
       // fillets
-      //translate([-pd_fr+hf_w/2+pb_sih-part_blower_mount_plate_thickness,bottom_y+pd_mh-e,-pb_z-pb_le-pb_ow-wt])
+      // duct horizontal
       translate([pb_x-pd_fr-part_blower_mount_plate_thickness,bottom_y+pd_mh-e,-pb_z-pb_le-pb_ow-wt])
       difference() {
         cube([pd_fr+e,pd_fr+e,pb_ow+2*wt]);
-        translate([0,pd_fr,-e]) cylinder(r=pd_fr,h=pb_ow+2*wt+2*e);
+        translate([0,pd_fr+e,-e]) cylinder(r=pd_fr,h=pb_ow+2*wt+2*e);
       }
-      translate([pd_mw/2,bottom_y,-pb_z-pb_le-pb_ow-wt+e])
+      // duct vertical
+      translate([pd_mw/2-e,bottom_y,-pb_z-pb_le-pb_ow-wt+e])
       rotate([-90,0,0])
       difference() {
         cube([pd_fr+e,pd_fr+e,pd_mh]);
-        translate([pd_fr,pd_fr,-e]) cylinder(r=pd_fr+e/2,h=pd_mh+2*e);
+        translate([pd_fr+e,pd_fr+e,-e]) cylinder(r=pd_fr,h=pd_mh+2*e);
       }
 
     }
@@ -676,17 +699,18 @@ module all () {
       }
 
       // fillets
-      translate([pb_x-pd_fr,bottom_y+pd_mh-wt-2*e,-pb_z-pb_le-pb_ow])
+      // duct horizontal
+      r = pd_fr+wt;
+      translate([pb_x-pd_fr-wt,bottom_y+pd_mh-wt-e-e,-pb_z-pb_le-pb_ow])
       difference() {
-        cube([pd_fr+e,pd_fr+e,pb_ow]);
-        translate([0,pd_fr,-e]) cylinder(r=pd_fr,h=pb_ow+2*e);
+        cube([r+e,r+e+e,pb_ow]);
+        translate([0,r+e+e,-e]) cylinder(r=r,h=pb_ow+2*e);
       }
+      // duct vertical
       translate([pd_mw/2-wt-e,bottom_y+wt,-pb_z-pb_le-pb_ow+e])
-      rotate([-90,0,0])
-      difference() {
-        r = pd_fr+wt;
+      rotate([-90,0,0]) difference() {
         cube([r+e,r+e,pd_mh-2*wt]);
-        translate([r,r,-wt]) cylinder(r=r,h=pd_mh);
+        translate([r+e,r+e,-wt]) cylinder(r=r,h=pd_mh);
       }
 
       // debug cutaways
