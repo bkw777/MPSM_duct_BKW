@@ -1,7 +1,7 @@
 {
     "fileFormatVersion": "1",
     "parameterSets": {
-        "40mm inserts chc": {
+        "40mm, heatserts, chc": {
             "clearance_above_print": "2",
             "cutaway_back": "false",
             "cutaway_back_y": "-4",
@@ -58,7 +58,7 @@
             "top_ledge_style": "2",
             "wall_thickness": "1"
         },
-        "40mm inserts chc 360": {
+        "40mm, heatserts, chc, 360": {
             "clearance_above_print": "2",
             "cutaway_back": "false",
             "cutaway_back_y": "-4",

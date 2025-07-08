@@ -40,6 +40,7 @@ M3 = [2.8,4.5,6];
 M4 = [3.6,5.7,8.5];
 
 /* [Misc] */
+wire_anchor = true;
 clearance_above_print = 2;
 fitment_clearance = 0.2;
 fc = fitment_clearance;
@@ -314,6 +315,19 @@ module carriage () {
 
 
 //////////////////////////////////////////////////////////////////////////////////
+
+module anchor() {
+  w = hf_fz;
+  d = w/2;
+  h = 4;
+  difference() {
+    group() {
+      translate([0,d,0]) cylinder(d=w,h=h);
+      translate([-w/2,0,0]) cube([w,d,h]);
+    }
+    translate([0,d,-e]) cylinder(d=w-4,h=h+2*e);
+  }
+}
 
 module hotend_fan_duct() {
   if(show_fans) translate([0,0,hf_z]) %fan();
@@ -669,6 +683,11 @@ module all () {
       translate([0,bottom_y,nozzle_y])
         rotate([-90,0,0])
           manifold();
+
+      // wire anchor
+      if (wire_anchor) translate([hew/2,heh/2-hebt,hf_fz/2])
+        rotate([0,-90,0])
+          anchor();
 
       // fillets
       // duct horizontal
