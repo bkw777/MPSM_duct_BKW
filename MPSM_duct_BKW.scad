@@ -33,10 +33,11 @@ cutaway_back = false;
 cutaway_back_y = -4;
 
 /* [Hidden] */
-// screw hole sizes [bare,insert]
-M2_5 = [2,4];
-M3 = [2.5,4.4];
-M4 = [3.2,5.6];
+// screw sizes, screw hole id, heatsert hole id, hole depth
+// SIZE[ID_bare,ID_heatsert,depth]
+M2_5 = [2,4,5];
+M3 = [2.8,4.5,6];
+M4 = [3.6,5.7,8.5];
 
 /* [Misc] */
 clearance_above_print = 2;
@@ -149,15 +150,17 @@ pb_oh = 2.5;   // outlet height
 part_blower_screw_hole_diameter = -1; // .1
 pb_sid =
   (part_blower_screw_hole_diameter>=0) ? part_blower_screw_hole_diameter :
-  M4[shd];
-//echo("part blower screw hole id (pb_sid)",pb_sid);
+  M3[shd];
+// -1 = auto
+part_blower_screw_hole_depth = -1; // .1
+pb_sih =
+  (part_blower_screw_hole_depth>=0) ? part_blower_screw_hole_depth:
+  M3[2];
+//echo ("part blower screw hole id,depth (pb_sid,pb_sih)",pb_sid,pb_sih);
 
-// M4 insert = 8.5
-part_blower_screw_hole_depth = 8.5;
-pb_sih = part_blower_screw_hole_depth;
-part_blower_mount_plate_thickness = 2;
+part_blower_mount_plate_thickness = 1;
 part_blower_lower_post = true;
-part_blower_lower_brace = false;
+part_blower_lower_brace = true;
 part_blower_lower_brace_depth = 2;
 
 part_blower_x = 0;
@@ -222,12 +225,10 @@ module blower () {
   import("lib/blower5015.stl");
 }
 
-module m3insert () {
-  translate([0,0,hf_sih]) rotate([180,0,0]) import("lib/insert_m3.stl");
-}
-
-module m4insert () {
-  translate([0,0,pb_sih]) rotate([180,0,0]) import("lib/insert_m4.stl");
+module heatsert (d) {
+  if (d>M2_5[1]-0.5&&d<M2_5[1]+0.5) rotate([180,0,0]) import("lib/insert_m2_5.stl");
+  else if (d>M3[1]-0.5&&d<M3[1]+0.5) rotate([180,0,0]) import("lib/insert_m3.stl");
+  else if (d>M4[1]-0.5&&d<M4[1]+0.5) rotate([180,0,0]) import("lib/insert_m4.stl");
 }
 
 module mirror_copy(v = [1, 0, 0]) {
@@ -316,10 +317,8 @@ module carriage () {
 
 module hotend_fan_duct() {
   if(show_fans) translate([0,0,hf_z]) %fan();
-  if(screw_hole_inserts && show_inserts) {
-    if(hf_sid>4&&hf_sid<5) mirror_copy([0,1,0]) mirror_copy([1,0,0]) translate([hf_bp/2,hf_bp/2,hf_z-hf_sih]) %m3insert();
-    if(hf_sid>5&&hf_sid<6) mirror_copy([0,1,0]) mirror_copy([1,0,0]) translate([hf_bp/2,hf_bp/2,hf_z-hf_sih]) %m4insert();
-  }
+  if(screw_hole_inserts && show_inserts)
+    mirror_copy([0,1,0]) mirror_copy([1,0,0]) translate([hf_bp/2,hf_bp/2,hf_z]) %heatsert(hf_sid);
 
   difference() {
     // add
@@ -414,9 +413,9 @@ module part_blower_mount() {
   // inlet face is +Z, outlet face is -Y
 
   if(show_fans) %blower();
-  if (screw_hole_inserts&&show_inserts&&pb_sid>5&&pb_sid<6) translate([0,0,-pb_sih]) {
-    translate([pb_tlx,pb_tly,0]) %m4insert();
-    translate([pb_brx,pb_bry,0]) %m4insert();
+  if (screw_hole_inserts&&show_inserts) {
+    translate([pb_tlx,pb_tly,0]) %heatsert(pb_sid);
+    translate([pb_brx,pb_bry,0]) %heatsert(pb_sid);
   }
 
   pwt = 2; // post wall thickness
