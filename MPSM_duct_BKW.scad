@@ -36,8 +36,8 @@ cutaway_back_y = -4;
 // screw sizes, screw hole id, heatsert hole id, hole depth
 // SIZE[ID_bare,ID_heatsert,depth]
 M2_5 = [2,4,5];
-M3 = [2.8,4.5,6];
-M4 = [3.6,5.7,8.5];
+M3 = [2.8,4.3,6];
+M4 = [3.6,5.6,8.5];
 
 /* [Misc] */
 wire_anchor = true;
@@ -57,7 +57,7 @@ hz = spring_hook_inset;
 spring_hook_clearance = 3;
 
 /* [Manifold] */
-manifold_jets_angle = 30;
+manifold_jets_angle = 35;
 manifold_opening_angle = 140;
 manifold_jets_diameter = 4; // .1
 manifold_jets = 10;
@@ -107,7 +107,7 @@ hf_z = hf_fz + hf_ft;
 // hotend fan ID
 hf_id = hf_w-wt*2;
 
-hotend_width = 34; // [34:"34 (square, and more room for spring clip)",35:"35 (flush with mating part)"]
+hotend_width = 35; // [34:"34 (square, and more room for spring clip)",35:"35 (flush with mating part)"]
 
 /* [Hidden] */
 hotend_fan_thickness = 20;
@@ -161,8 +161,7 @@ pb_sih =
 
 part_blower_mount_plate_thickness = 1;
 part_blower_lower_post = true;
-part_blower_lower_brace = true;
-part_blower_lower_brace_depth = 2;
+part_blower_lower_brace_depth = 3;
 
 part_blower_x = 0;
 pb_x = part_blower_x + (hf_w>=40 ? hf_w/2+pb_sih : 20+pb_sih);
@@ -385,8 +384,8 @@ module hotend_fan_duct() {
 
         // boss
         hull() {
-          translate([-bw/2,-hw/2,bz]) cube([bw,hw,hh]);
-          translate([-hew/2-e,-hw/2,bz-(bw-hew)/2]) cube([hew+e+e,hw,1]);
+          translate([-bw/2,0,hh+bz]) rotate([0,90,0]) cylinder(d=hw,h=bw);
+          translate([-hew/2,-hw/2,bz-(bw-hew)/2]) cube([hew,hw,1]);
         }
         // if fan width less than the boss, then add a front boss
         if (hf_w<bw) hull() {
@@ -463,7 +462,7 @@ module part_blower_mount() {
       }
 
       bw = part_blower_lower_brace_depth;
-      if (part_blower_lower_brace) translate([pb_tlx+pb_sid/2,pb_bry-pt/2,-pt-bw]) cube([pw-pb_sid,pt,bw+e]);
+      if (bw) translate([pb_tlx+pb_sid/2,pb_bry-pt/2,-pt-bw]) cube([pw-pb_sid,pt,bw+e]);
 
 
       // plate
