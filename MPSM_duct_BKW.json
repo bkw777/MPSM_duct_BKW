@@ -1,7 +1,7 @@
 {
     "fileFormatVersion": "1",
     "parameterSets": {
-        "40mm, heatserts, chc": {
+        "30mm, no heatserts, chc": {
             "clearance_above_print": "3",
             "cutaway_back": "false",
             "cutaway_back_y": "-4",
@@ -23,7 +23,7 @@
             "hotend_fan_flange_thickness": "-1",
             "hotend_fan_screw_hole_depth": "-1",
             "hotend_fan_screw_hole_diameter": "-1",
-            "hotend_fan_size": "40",
+            "hotend_fan_size": "30",
             "hotend_width": "34",
             "manifold_jets": "10",
             "manifold_jets_angle": "38",
@@ -43,7 +43,7 @@
             "pillar_chamfer": "1",
             "pillar_diameter": "5",
             "pillar_y": "-4",
-            "screw_hole_inserts": "true",
+            "screw_hole_inserts": "false",
             "show_build_plate": "true",
             "show_carriage": "true",
             "show_fans": "true",
@@ -53,7 +53,6 @@
             "small_corner_radius": "2",
             "spring_hook_clearance": "3",
             "spring_hook_inset": "6",
-            "spring_hook_style": "1",
             "top_ledge_style": "2",
             "wall_thickness": "1"
         },
@@ -109,7 +108,6 @@
             "small_corner_radius": "2",
             "spring_hook_clearance": "3",
             "spring_hook_inset": "6",
-            "spring_hook_style": "1",
             "top_ledge_style": "2",
             "wall_thickness": "1"
         },
@@ -165,7 +163,6 @@
             "small_corner_radius": "2.0000000000000009",
             "spring_hook_clearance": "3",
             "spring_hook_inset": "6",
-            "spring_hook_style": "1",
             "top_ledge_style": "2",
             "wall_thickness": "1"
         },
@@ -221,7 +218,6 @@
             "small_corner_radius": "2",
             "spring_hook_clearance": "3",
             "spring_hook_inset": "6",
-            "spring_hook_style": "1",
             "top_ledge_style": "2",
             "wall_thickness": "1"
         },
@@ -277,7 +273,6 @@
             "small_corner_radius": "2",
             "spring_hook_clearance": "3",
             "spring_hook_inset": "6",
-            "spring_hook_style": "1",
             "top_ledge_style": "2",
             "wall_thickness": "1"
         }

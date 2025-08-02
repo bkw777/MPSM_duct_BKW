@@ -35,7 +35,7 @@ cutaway_back_y = -4;
 /* [Hidden] */
 // screw sizes, screw hole id, heatsert hole id, hole depth
 // SIZE[ID_bare,ID_heatsert,depth]
-M2_5 = [2,4,5];
+M2_5 = [2,3.7,5];
 M3 = [2.8,4.3,6];
 M4 = [3.6,5.6,8.5];
 
@@ -51,7 +51,6 @@ small_corner_radius = 2; // .1
 top_ledge_style = 2; // [0:"None",1,2,3]
 
 /* [Spring Hooks] */
-spring_hook_style = 1; // [0,1]
 spring_hook_inset = 6;
 hz = spring_hook_inset;
 spring_hook_clearance = 3;
@@ -226,9 +225,10 @@ module blower () {
 }
 
 module heatsert (d) {
-  if (d>M2_5[1]-0.5&&d<M2_5[1]+0.5) rotate([180,0,0]) import("lib/insert_m2_5.stl");
-  else if (d>M3[1]-0.5&&d<M3[1]+0.5) rotate([180,0,0]) import("lib/insert_m3.stl");
-  else if (d>M4[1]-0.5&&d<M4[1]+0.5) rotate([180,0,0]) import("lib/insert_m4.stl");
+  echo ("heatsert(d)",d);
+  if ( (d>M2_5[1]-0.5) && (d<M2_5[1]+0.5) ) rotate([180,0,0]) import("lib/insert_m2_5.stl");
+  else if ( (d>M3[1]-0.5) && (d<M3[1]+0.5) ) rotate([180,0,0]) import("lib/insert_m3.stl");
+  else if ( (d>M4[1]-0.5) && (d<M4[1]+0.5) ) rotate([180,0,0]) import("lib/insert_m4.stl");
 }
 
 module mirror_copy(v = [1, 0, 0]) {
@@ -360,42 +360,26 @@ module hotend_fan_duct() {
       
       // spring hooks
       hw = 3.5; // hook width
-      hh = (spring_hook_style==0)?5:3;   // hook height
+      hh = 3;   // hook height
       bz = hz-hh; // boss z
 
       // hard code boss width to 40 so it's flush with a 40mm fan,
-      // but having it match other fan sizes won't work
+      // but flush doesn't work for any other fan sizes
       bw = 40;
 
-      if (spring_hook_style==0) {
-        // boss
-        hull() {
-          translate([-bw/2,-hw/2,bz]) cube([bw,hw,hh]);
-          translate([-hew/2,-hw*1.5,bz]) cube([hew,1,hh]);
-        }
-        mirror_copy([1,0,0]) {
-          // hook      
-          hull() {
-            translate([bw/2-1,0,bz+hh+1]) rotate([0,90,0]) cylinder(d=hw,h=1);
-            translate([bw/2-1,-hw/2,bz]) cube([1,hw,hh]);
-          }
-        }
-      } else if (spring_hook_style==1) {
-
-        // boss
-        hull() {
-          translate([-bw/2,0,hh+bz]) rotate([0,90,0]) cylinder(d=hw,h=bw);
-          translate([-hew/2,-hw/2,bz-(bw-hew)/2]) cube([hew,hw,1]);
-        }
-        // if fan width less than the boss, then add a front boss
-        if (hf_w<bw) hull() {
-          translate([-bw/2,-hw/2,hf_fz-hh]) cube([bw,hw,1]);
-          translate([-hew/2,-hw/2,hf_fz-1]) cube([hew,hw,1]);
-        }        
-        // hook
-        hl = (hf_w<bw)? hf_fz-hz-hh:hf_fz-hz;
-        mirror_copy([1,0,0]) translate([bw/2-1,-hw/2,hz-e]) cube([1,hw,hl+e+e]);
+      // boss
+      hull() {
+        translate([-bw/2,0,bz+hh]) rotate([0,90,0]) cylinder(d=hw,h=bw);
+        translate([-hew/2,0,bz-hw/2]) rotate([0,90,0]) cylinder(d=hw,h=hew);
       }
+      // if fan width less than the boss, then add a front boss
+      if (hf_w<bw) hull() {
+        translate([-bw/2,-hw/2,hf_fz-hh]) cube([bw,hw,1]);
+        translate([-hew/2,-hw/2,hf_fz-1]) cube([hew,hw,1]);
+      }
+      // hook
+      hl = (hf_w<bw)? hf_fz-hz-hh:hf_fz-hz;
+      mirror_copy([1,0,0]) translate([bw/2-1,-hw/2,hz-e]) cube([1,hw,hl+e+e]);
 
     }
 
@@ -406,7 +390,7 @@ module hotend_fan_duct() {
       //translate([0,0,hf_z-hf_sih]) qc(w=hf_bp,d=hf_bp,h=hf_sih+e,r=hf_sid/2);
 
       // hotend interface slot
-      translate([-hebw/2-fc,-heh/2-e,-hebt-e]) cube([hebw+fc*2,heh+e*2,hebt+e]);
+      translate([-hebw/2-fc/4,-heh/2-e,-hebt-e]) cube([hebw+fc/2,heh+e*2,hebt+e]);
       
       // funnel
       // fan
