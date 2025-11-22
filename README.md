@@ -38,5 +38,5 @@ It's still an improvement over stock because now it's dedicated 100% to the heat
 ![](manifold_opening_angle.png)
 
 
-With a CHC heater, the blower output manifold can go all the way around the nozzle in a donut, amd the duct & manifold tube can be a little bigger.
+With a CHC heater, the blower output manifold can go all the way around the nozzle in a donut, and the duct & manifold tube can be a little bigger.
 ![](MPSM_duct_BKW_5.jpg)
