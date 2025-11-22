@@ -7,14 +7,18 @@ Hotend fan and part cooling blower duct for Monoprice Select Mini 3d printer.
 ![](MPSM_duct_BKW_3.jpg)
 ![](MPSM_duct_BKW_4.jpg)
 
+The source is in OpenSCAD. The FreeCAD file is only used to make the pretty renders.  
 The model is highly parametric and uses the openscad customizer to adjust all kinds of things.  
+
 The major options are:  
 * Fan size: 40mm, 35mm, 30mm
 * Screw holes sized for screwing directly into the plastic, or pockets for heat-set inserts
 
 Other options:
 * Stock vs [CHC](https://trianglelab.net/products/chcceramic-heating-core-kit?VariantsId=10256) heater cartridge
-* Degrees of wrap around the nozzle. With a CHC heater, the blower output manifold can go all the way around the nozzle in a ring.
+* Degrees of wrap around the nozzle.
+
+With a CHC heater, the blower output manifold can go all the way around the nozzle in a donut, amd the duct & manifold tube can be a little bigger.
 
 40mm fan  
 You don't need a 40x20 like this. A silent Noctua 40x10 would be plenty considering the original fan is only 30x10 and did both the heat-break and the part cooling.  
