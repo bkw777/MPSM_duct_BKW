@@ -38,10 +38,6 @@ It's still an improvement over stock because now it's dedicated 100% to the heat
 ![](manifold_opening_angle.png)
 
 
-![](manifold_jets_angle.png)
-![](manifold_opening_angle.png)
-
-
 With a CHC heater, the blower output manifold can go all the way around the nozzle in a donut, and the duct & manifold tube can be a little bigger.
 
 Stock heat block:  
