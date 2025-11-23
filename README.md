@@ -2,6 +2,8 @@
 
 Hotend fan and part cooling blower duct for Monoprice Select Mini 3d printer.
 
+![](as1.jpg)
+![](as2.jpg)
 ![](MPSM_duct_BKW.jpg)
 ![](MPSM_duct_BKW_2.jpg)
 ![](MPSM_duct_BKW_3.jpg)
