@@ -1,13 +1,13 @@
-# MPSM_duct_BKW
+# MPSM_Duct
 
 Hotend fan and part cooling blower duct for Monoprice Select Mini 3d printer.
 
 ![](as1.jpg)
 ![](as2.jpg)
-![](MPSM_duct_BKW.jpg)
-![](MPSM_duct_BKW_2.jpg)
-![](MPSM_duct_BKW_3.jpg)
-![](MPSM_duct_BKW_4.jpg)
+![](MPSM_Duct.jpg)
+![](MPSM_Duct_2.jpg)
+![](MPSM_Duct_3.jpg)
+![](MPSM_Duct_4.jpg)
 
 The model is highly parametric and uses the customizer panel in OpenSCAD to adjust all kinds of things.  
 
@@ -47,6 +47,6 @@ Stock heat block:
 
 CHC ceramic heater cartridge:  
 ![](CHC_heater.png)
-![](MPSM_duct_BKW_5.jpg)
+![](MPSM_Duct_5.jpg)
 
 
